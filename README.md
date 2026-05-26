@@ -162,8 +162,7 @@ deep-research/
 
 ## 相关项目
 
-- [hv-analysis](https://github.com/KKKKhazix/khazix-skills) - 横纵分析法方法论
-- [数字生命卡兹克](https://mp.weixin.qq.com/) - 公众号
+- [[hv-analysis](https://github.com/KKKKhazix/khazix-skills](https://github.com/KKKKhazix/khazix-skills)) - 横纵分析法方法论
 
 ## 许可
 
