@@ -1,4 +1,4 @@
-# Kai# Deep Research Skill
+# Deep Research Skill
 
 横纵分析法深度研究的执行系统。在 [hv-analysis](https://github.com/KKKKhazix/khazix-skills) 的基础上，加装来源审计、质检复查、工具分层等模块。
 
@@ -162,8 +162,9 @@ deep-research/
 
 ## 相关项目
 
-- [[hv-analysis](https://github.com/KKKKhazix/khazix-skills](https://github.com/KKKKhazix/khazix-skills)) - 横纵分析法方法论
+- [hv-analysis](https://github.com/KKKKhazix/khazix-skills) - 横纵分析法方法论
 
 ## 许可
 
 MIT
+
