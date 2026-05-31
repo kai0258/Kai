@@ -1,0 +1,62 @@
+Deep Research Skill 版本迭代记录
+================================
+
+记录人：Kai
+仓库：github.com/kai0258/Kai
+
+
+v1.0（初始版本）
+----------------
+基于 hv-analysis 横纵分析法改造，新增信息审计、来源分级、质检矩阵。
+
+核心内容：
+- 六阶段流水线：需求解析 → 信息采集 → 信息审计 → 报告写作 → 质检复查 → 交付存档
+- A/B/C/D 四级来源可信度分级
+- 12项评分矩阵，100分制，90分及格
+- 硬否决（编造/教科书开头）+ 软否决（套话/踩雷词）
+- 三层工具分层策略
+- L1/L2/L3 三档深度等级
+- 3个参考文件：irsp.md、quality.md、writing.md
+- 2个脚本：write_report.py、md_to_pdf.py
+
+
+v2.0（当前版本）
+----------------
+经过69篇横纵分析报告的实际打磨，新增关键事实追溯、三级来源规范、来源冲突处理、批量审查工具等。
+
+新增文件：
+- references/audit-checklist.md — 四层审查清单（版本一致性、信息源合规、模糊引用、三级来源依赖）
+- references/source-audit-methodology.md — 来源质量审查方法，含审查脚本模板和问题模式分级
+
+移除文件：
+- scripts/md_to_pdf.py — 公开版移除，改为默认Markdown输出
+
+SKILL.md 新增内容：
+- Trigger Decision Rules：基于意图的触发规则，替代关键词匹配
+- Critical Fact Definition：明确关键事实的定义（日期、数字、因果判断、比较结论等）
+- Source Ledger：来源台账，记录每个来源的名称、URL、发布日期、证据支撑、可信度等级、利益冲突
+- Information Gap Handling：信息不足时的标准化处理流程
+- Comparison Mode Selection：横轴分析前先判断场景（A无竞品/B少量竞品/C竞品充分）
+- 报告模板新增 Core Findings（3-5条核心结论摘要）
+- 报告模板新增 Scope and Boundaries（覆盖范围、未覆盖内容、已知局限）
+- 报告模板新增 Research Date（研究日期标注）
+- 长报告写入工作流（分段写入、每段控制5000字以内、写完验证）
+
+irsp.md 新增内容：
+- Encyclopedia & Tertiary Sources Policy（三级来源规范）：Wikipedia等百科类来源的允许用途、限制、使用流程
+- Reasonable Verification Principle（合理验证原则）：尽合理努力寻找更高质量来源，但不必无限追溯
+- Citation Chain Check（引用链审查）：追踪引用链末端的最终来源质量
+- Conflicting Evidence Protocol（来源冲突处理）：不强行调和，并列呈现、评估证据强度
+
+quality.md 变更：
+- 评分矩阵从12项扩展到13项
+- 新增第13项：关键事实可追溯性（Critical Fact Traceability），5分
+- 每项新增90/75/60三档评分锚点
+- 新增 Improvement Cycle（补强闭环流程）流程图
+- 新增复查流程模板
+
+writing.md 新增内容：
+- 文化升维：交汇洞察部分连接到更大的文化/哲学/历史参照物
+- 回环呼应：开头埋的钩子在结尾callback
+- 层层剥开：现象 → 表面解释 → 更深追问 → 核心洞察的展开方式
+- 不同研究对象类型的风格适配指南
