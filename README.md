@@ -1,43 +1,225 @@
-# Kai's AI Skills
+# Deep Research
 
-个人调教的 AI Agent Skills 集合。每个 skill 都是长期使用中逐步打磨出来的，不是模板生成的。
+A production-grade research operating system built on top of [hv-analysis](https://github.com/KKKKhazix/khazix-skills). Adds source auditing, quality scoring, tool layering, and delivery standards to the horizontal-vertical analysis framework.
+
+**hv-analysis is the methodology. Deep Research is the execution system.**
+
+[中文文档](#中文文档)
 
 ---
 
-## Deep Research Skill
+## What it does
 
-横纵分析法深度研究的执行系统。在 [hv-analysis](https://github.com/KKKKhazix/khazix-skills) 的基础上，加装来源审计、质检复查、工具分层等模块。
+Deep Research turns a research request into a scored, audited report through a six-stage pipeline that cannot be skipped:
 
-**一句话说清楚两者的关系：hv-analysis是方法论，Deep Research是执行系统。**
+```
+Request Parsing → Source Collection → Source Audit → Report Writing → Quality Review → Delivery
+```
 
-### 背景
+The key differentiator is **Stage 3 (Source Audit)** — before writing begins, the agent must verify that information is sufficient, balanced, and traceable. If the core narrative chain has gaps, it must search again. If it still can't find the information, it marks it as "information unavailable" rather than fabricating.
 
-hv-analysis skill（横纵分析法）来自 [KKKKhazix/khazix-skills](https://github.com/KKKKhazix/khazix-skills)。
+## Quick start
 
-Deep Research是用横纵分析法分析课题时，逐步改造出的更适合实际使用的分析方法。
+### Option A: Agent install prompt (recommended)
 
-hv-analysis定义了「横纵分析法」这个研究框架——纵轴追时间深度，横轴追同期广度，最后交汇出判断。这个框架本身没有问题，效果很好。但hv-analysis作为一个skill，它更像是一个「写作指南」而不是「研究操作系统」。它告诉你报告应该长什么样，但没有告诉你怎么保证报告的质量。
+We provide a ready-to-use prompt template: [`AGENT_INSTALL_PROMPT.md`](AGENT_INSTALL_PROMPT.md). Copy its content, paste it to your AI Agent (Claude Code, Hermes, Codex, etc.), and the Agent will:
 
-Deep Research在hv-analysis的基础上，做了几个关键改造。
+1. Clone the repo and install the skill
+2. Scan all placeholder values across 4 files
+3. Ask you for your archive path and research region
+4. Fill in the values for you
+
+If you just want the short version, paste this:
+
+```
+请帮我安装 Deep Research Skill。从 https://github.com/kai0258/Kai.git 克隆仓库，把 deep-research 目录复制到你的 skills 目录下。完成后扫描 SKILL.md、references/irsp.md、references/audit-checklist.md、references/source-audit-methodology.md 中的占位符（搜索 [your-archive-directory] 和 [用户自定义]），把需要我填写的位置整理成清单告诉我，然后问我存档路径和研究领域，帮我填进去。
+```
+
+### Option B: Shell script
+
+The [`install.sh`](install.sh) script auto-detects `~/.hermes/skills/` and `~/.claude/skills/`, installs to both, and prints a checklist of all placeholder values you need to fill in.
+
+One-liner (download and run):
+
+```bash
+bash <(curl -sL https://raw.githubusercontent.com/kai0258/Kai/main/deep-research/install.sh)
+```
+
+Or clone first, then run locally:
+
+```bash
+git clone --depth 1 https://github.com/kai0258/Kai.git /tmp/kai-skills
+bash /tmp/kai-skills/deep-research/install.sh
+# or specify a custom target:
+bash /tmp/kai-skills/deep-research/install.sh /path/to/your/skills/
+```
+
+### Option C: Manual install
+
+Copy the `deep-research` directory into your agent's skills folder:
+
+```
+~/.hermes/skills/          # Hermes
+~/.claude/skills/          # Claude Code
+```
+
+**Required:**
+- Agent environment (Claude Code, Hermes, Codex, etc.)
+- Web search capability (WebSearch / WebFetch)
+
+**Recommended:**
+- firecrawl (search + scrape)
+- exa (semantic search)
+
+Without firecrawl/exa the skill degrades — still usable, but experience is not as smooth as hv-analysis with basic WebSearch.
+
+## ⚠️ Configuration required before first use
+
+This skill ships with **placeholder values** that you must customize for your own research context. Read this section before running your first research.
+
+### 1. Banned source list (critical)
+
+The IRSP protocol excludes state-controlled propaganda outlets from being used as evidence. However, **the list of banned sources is intentionally left blank** — you need to define it yourself based on your region and research domain.
+
+**Where to configure:**
+
+| File | What to fill in |
+|------|-----------------|
+| `references/irsp.md` | The example list in the "Core Rules" section (line ~20) |
+| `references/audit-checklist.md` | The `[用户自定义的受控媒体名单]` placeholder in the sources section check |
+| `references/source-audit-methodology.md` | The `banned = [...]` list in the review script template |
+
+**How to fill in:** Add the names and domains of state-controlled media outlets relevant to your research. For example, if you research topics involving Russia, you might add RT and TASS. If you research topics involving a different region, add the relevant outlets from that region.
+
+### 2. Archive path
+
+In `SKILL.md`, the delivery path is set to `[your-archive-directory]`. Replace it with your actual path where completed reports should be saved.
+
+### 3. Tool configuration
+
+The tool layering strategy references specific tools (firecrawl, exa, academic-research MCP). If you don't have all of them, the skill will degrade gracefully — but you should know which tools you have available before starting.
+
+### Why we don't ship a pre-filled list
+
+Different users research different regions. A researcher studying East Asian politics needs a different banned-source list than someone studying European affairs. Shipping a pre-filled list would either be incomplete (missing your region) or overreaching (including regions you never research). **You know your own research context better than we do.**
+
+## Core features
+
+### Source Quality Protocol (IRSP)
+
+Four-tier credibility grading (A/B/C/D) with specific rules:
+
+- State-controlled propaganda outlets are excluded outright
+- Academic sources prioritized over media; media over blogs
+- Wikipedia and other tertiary sources allowed for navigation, but not as sole evidence for key conclusions
+- Conflicting high-quality sources are presented side-by-side, not forced into false consensus
+
+### 13-item scoring matrix (100-point scale, 90 to pass)
+
+| # | Criterion | Points |
+|---|-----------|--------|
+| 1 | Narrative quality (vertical) | 15 |
+| 2 | Key node expansion | 10 |
+| 3 | Decision logic reconstruction | 10 |
+| 4 | Horizontal scene judgment (A/B/C) | 5 |
+| 5 | Horizontal analysis depth | 15 |
+| 6 | Cross-axis originality | 10 |
+| 7 | Future scenario logic | 5 |
+| 8 | Source quality | 10 |
+| 9 | Information balance | 5 |
+| 10 | Writing style | 5 |
+| 11 | No prohibited patterns | 5 |
+| 12 | Length compliance | 5 |
+| 13 | Critical fact traceability | 5 |
+
+**Hard vetoes** (immediate rejection): fabricated information, textbook-style opening ("In today's rapidly evolving AI era...").
+
+**Soft vetoes** (section locked to minimum score): 2+ instances of filler phrases, buzzwords, or empty adjectives.
+
+### Tool layering strategy
+
+| Layer | Tools | When |
+|-------|-------|------|
+| Core search | firecrawl_search, exa_web_search | Always |
+| Deep extraction | firecrawl_scrape, firecrawl_extract, firecrawl_agent | Known URLs, complex navigation |
+| Academic boost | academic-research MCP, my-research MCP | Cross-verification, DOI lookup |
+
+When a layer is unavailable (API limits, MCP not installed), the agent falls back gracefully instead of failing.
+
+### Depth levels
+
+| Level | Words | Use case |
+|-------|-------|----------|
+| L1 Quick scan | 3,000–5,000 | Single clear object |
+| L2 Standard | 10,000–15,000 | Medium complexity |
+| L3 Deep | 15,000–30,000 | Long history, high controversy |
+
+## File structure
+
+```
+deep-research/
+├── SKILL.md                           # Main file — full six-stage pipeline
+├── references/
+│   ├── irsp.md                        # Source screening protocol + tertiary source policy
+│   ├── quality.md                     # 13-item scoring matrix with rubrics
+│   ├── writing.md                     # Style guide (rhythm, narrative drive, cultural elevation)
+│   ├── audit-checklist.md             # Four-layer audit checklist for batch review
+│   └── source-audit-methodology.md    # Source audit methodology + review script template
+└── scripts/
+    └── write_report.py                # Segmented write tool for long reports
+```
+
+## Background
+
+hv-analysis defines the horizontal-vertical framework: vertical axis for temporal depth, horizontal axis for contemporary breadth, cross-axis for original insight. The framework works well. But hv-analysis is a writing guide — it tells you what a good report looks like, not how to guarantee quality.
+
+Deep Research inherits the analysis framework entirely, then adds execution-level safeguards:
+
+| Dimension | hv-analysis | Deep Research |
+|-----------|-------------|---------------|
+| Positioning | Writing guide | Research operating system |
+| Pipeline | 5 steps | 6 steps (+ source audit) |
+| Sources | "Primary over secondary" | A/B/C/D grading + cross-verification |
+| Quality | 14 checkboxes | 13-item scoring matrix, 100-point scale |
+| Veto | None | Hard veto + soft veto |
+| Tools | WebSearch/WebFetch | Three-layer strategy |
+| Length | Fixed 10K–30K words | L1/L2/L3 adaptive |
+| Weight | Lightweight, web-friendly | Heavy, agent-only |
+
+### When to use which
+
+Use hv-analysis when you need a quick overview and don't require strict source auditing. It's lighter, faster, easier to get started.
+
+Use Deep Research when you need a report that can withstand scrutiny — key facts backed by sources, both sides of controversies covered, no AI-speak filler or fabrication. It's heavier and slower, but the quality floor is higher.
+
+They're not in conflict. Think of Deep Research as the production-environment version of hv-analysis.
+
+## Limitations
+
+1. **Heavier.** SKILL.md + 5 references + 1 script = more tokens on first load.
+2. **Slower.** Two extra stages (source audit + quality review) add execution time.
+3. **Tool-dependent.** Designed for firecrawl/exa; without them, degradation is noticeable.
+4. **Limited validation.** 69 reports produced so far across products, companies, concepts, people, and historical events. Not a large-scale controlled study.
+
+## Related projects
+
+- [hv-analysis](https://github.com/KKKKhazix/khazix-skills) — Horizontal-vertical analysis methodology
+
+---
+
+## 中文文档
+
+### 这是什么
+
+横纵分析法深度研究的执行系统。在 hv-analysis 的基础上，加装来源审计、质检复查、工具分层等模块。
+
+**hv-analysis 是方法论，Deep Research 是执行系统。**
 
 ### 适用场景
 
 需要一份经得起推敲的研究报告时使用——关键事实有来源支撑、正反面声音都有覆盖、不会出现AI味的套话和编造。
 
 适合研究：产品、公司、概念、人物、历史事件、技术范式。
-
-### 与hv-analysis的核心区别
-
-| 维度 | hv-analysis | Deep Research |
-|------|-------------|---------------|
-| 定位 | 写作指南 | 研究操作系统 |
-| 流程 | 5步 | 6步（多了信息审计） |
-| 信息源 | "一手优于二手" | A/B/C/D四级分级 + 多源印证 |
-| 质检 | 14个checkbox | 12项评分矩阵，100分制，90分及格 |
-| 否决机制 | 无 | 硬否决（编造/教科书开头）+ 软否决（套话/踩雷词） |
-| 工具 | WebSearch/WebFetch | 三层分层策略 |
-| 篇幅 | 固定1-3万字 | L1/L2/L3三档 |
-| 重量 | 轻量，网页端可用 | 重量级，仅限Agent环境 |
 
 ### 六阶段流水线
 
@@ -47,253 +229,139 @@ Deep Research在hv-analysis的基础上，做了几个关键改造。
 
 每一步不可跳过。关键区别在第三步「信息审计」——动笔之前确保信息是够的。
 
-#### 信息审计做了什么？
-
-信息采集完成后，agent必须先执行一次独立审计：
-- 纵向时间线有没有断层？
-- 每个关键节点有没有2个以上独立来源支撑？
-- 正反面声音都有吗？
-
-核心叙事链有断层就必须补搜，补不了才标注「该信息暂缺」。这一步确保了「动笔之前信息是够的」。
-
-### 信息源质量协议（IRQP）
-
-hv-analysis有一条简单的规则：「一手来源优于二手来源」。这当然对，但远远不够。
-
-Deep Research内置了一套完整的信息源质量协议：
+### 信息源质量协议（IRSP）
 
 - **来源可信度分级**：A/B/C/D四级
-- **多源印证规则**：识别循环印证、通稿分发、匿名知情人士等陷阱
-- **时效性规则**：技术类6个月过期，商业类以最近财年为准
-- **立场平衡规则**：争议话题必须引用不同立场的来源
+- **受政权控制的宣传机构一律排除**
+- **多源印证规则**：识别循环印证、通稿分发等陷阱
+- **三级来源规范**：Wikipedia等可用于导航，但不得作为关键结论的唯一依据
+- **来源冲突处理**：高质量来源意见不一致时，并列呈现、评估证据强度，不强行调和
 
-这套协议的价值不在于「排除坏来源」，而在于「建立判断来源好坏的思维框架」。
+### 13项评分矩阵
 
-### 12项评分矩阵 + 否决机制
+满分100分，90分及格。每项有分值、评分标准和常见扣分点。
 
-hv-analysis有一个质检清单，14个checkbox，逐条打勾。问题是：checkbox只能告诉你「有没有做」，不能告诉你「做得好不好」。
+**硬否决（直接不交付）：** 编造信息、教科书开头
 
-Deep Research用12项评分矩阵替代了checkbox，满分100，90分及格。每项都有分值、评分标准和常见扣分点。
+**软否决（该项锁死最低分）：** 2处以上套话、2处以上踩雷词、空洞形容词
 
-#### 否决机制
+### v2 新增特性
 
-**硬否决（直接不交付）：**
-- 编造信息
-- 教科书开头（「在当今AI快速发展的时代」）
+相比初版，当前版本新增：
 
-**软否决（该项锁死最低分）：**
-- 2处以上套话
-- 2处以上踩雷词
-- 空洞形容词
-
-硬否决优先于总分——即使其他项目满分，触发硬否决仍不交付。
-
-### 工具分层策略
-
-hv-analysis告诉agent「必须联网搜索」，然后给了几个工具名。Deep Research把搜索工具分成了三层：
-
-- **第一层（核心搜索）**：firecrawl_search、exa_web_search
-- **第二层（深度提取）**：firecrawl_scrape、firecrawl_extract、firecrawl_agent
-- **第三层（学术增强）**：academic-research MCP、my-research MCP
-
-分层的意义在于：当某一层工具不可用时（比如API限流、MCP没装），agent知道该退到哪一层，而不是直接报错或放弃。
-
-### 深度等级
-
-| 等级 | 字数 | 适用场景 |
-|------|------|----------|
-| L1 速览 | 3,000-5,000 | 单一明确对象，以Exa搜索为主 |
-| L2 标准 | 10,000-15,000 | 中等复杂度，Exa+Firecrawl |
-| L3 深度 | 15,000-30,000 | 历史长、争议大的对象，全工具链 |
-
-这意味着研究「Hermes Agent」和研究「女权主义运动史」不应该用同一套流程。
-
-### 写作风格和禁区
-
-两者在写作风格上的要求高度一致，但Deep Research把「绝对禁区」从写作建议升级为了质检标准。
-
-hv-analysis说「不要写套话」，Deep Research说「写套话扣分，写多了不交付」。
-
-前者是建议，后者是纪律。
+- **Trigger Decision Rules**：基于意图的触发规则
+- **Critical Fact Definition**：关键事实的明确界定
+- **Source Ledger**：来源台账
+- **Information Gap Handling**：信息不足时的标准化处理
+- **Comparison Mode Selection**：横轴分析前的A/B/C场景判断
+- **Core Findings**：报告开头新增核心结论摘要
+- **Scope and Boundaries**：覆盖范围与已知局限
+- **Research Date**：研究日期标注
+- **三级来源规范**：百科类来源的使用流程和限制
+- **来源冲突处理协议**
+- **四层审查清单**：版本一致性、信息源合规、模糊引用、三级来源依赖
+- **来源审查方法**：含审查脚本模板
+- **文化升维**：连接到更大的文化/哲学/历史参照物
+- **回环呼应**：开头埋的钩子在结尾callback
 
 ### 文件结构
 
 ```
 deep-research/
-├── SKILL.md                    # 主文件，完整的六阶段流程
+├── SKILL.md                           # 主文件，完整的六阶段流程
 ├── references/
-│   ├── quality.md              # 12项评分矩阵详细标准
-│   ├── writing.md              # 写作风格指南
-│   └── irsp.md                 # 信息源筛查协议
+│   ├── irsp.md                        # 信息源筛查协议（含三级来源规范、来源冲突处理）
+│   ├── quality.md                     # 13项评分矩阵详细标准
+│   ├── writing.md                     # 写作风格指南（含文化升维、回环呼应）
+│   ├── audit-checklist.md             # 四层审查清单（批量质检用）
+│   └── source-audit-methodology.md    # 来源质量审查方法（含审查脚本模板）
 └── scripts/
-    ├── write_report.py         # 长报告分段写入脚本
-    └── md_to_pdf.py            # Markdown转PDF脚本
+    └── write_report.py                # 长报告分段写入脚本
 ```
 
-### 使用要求
-
-**必须：**
-- Agent环境（Claude Code、Hermes、Codex等）
-- 联网搜索能力（WebSearch/WebFetch）
-
-**推荐：**
-- firecrawl（搜索 + 抓取）
-- exa（语义搜索）
-
-没有firecrawl/exa时会退化，体验不如直接用hv-analysis。
-
 ### 安装
+
+#### 方式一：给 Agent 一句话搞定（推荐）
+
+我们提供了一个现成的安装提示词模板：[`AGENT_INSTALL_PROMPT.md`](AGENT_INSTALL_PROMPT.md)。复制内容发给你的 Agent，它会自动完成安装并引导你配置所有占位符。
+
+如果你不想打开文件，直接复制这段话发给 Agent 也行：
+
+```
+请帮我安装 Deep Research Skill。从 https://github.com/kai0258/Kai.git 克隆仓库，把 deep-research 目录复制到你的 skills 目录下。完成后扫描 SKILL.md、references/irsp.md、references/audit-checklist.md、references/source-audit-methodology.md 中的占位符（搜索 [your-archive-directory] 和 [用户自定义]），把需要我填写的位置整理成清单告诉我，然后问我存档路径和研究领域，帮我填进去。
+```
+
+#### 方式二：Shell 脚本
+
+[`install.sh`](install.sh) 脚本会自动检测 `~/.hermes/skills/` 和 `~/.claude/skills/`，安装到两个位置，并打印需要填写的占位符清单。
+
+一行命令：
+
+```bash
+bash <(curl -sL https://raw.githubusercontent.com/kai0258/Kai/main/deep-research/install.sh)
+```
+
+或克隆后本地运行：
+
+```bash
+git clone --depth 1 https://github.com/kai0258/Kai.git /tmp/kai-skills
+bash /tmp/kai-skills/deep-research/install.sh
+# 指定自定义安装路径：
+bash /tmp/kai-skills/deep-research/install.sh /path/to/your/skills/
+```
+
+#### 方式三：手动安装
 
 将 `deep-research` 目录放到你的skills目录下：
 
 - Hermes: `~/.hermes/skills/`
 - Claude Code: `~/.claude/skills/`
 
-### Deep Research的局限
+**必须：** Agent环境 + 联网搜索能力
 
-说了这么多优点，也要诚实讲局限：
+**推荐：** firecrawl + exa
 
-1. **更重**。hv-analysis是一个轻量级skill，文件小、流程短、上手快。Deep Research有SKILL.md + 3个references + 2个scripts，首次加载token更多。
-2. **更慢**。多了信息审计和质检复查两个环节，执行时间更长。
-3. **更挑工具**。Deep Research的工具分层策略假设你有firecrawl和exa，如果没有，退化后的体验不如hv-analysis直接用WebSearch/WebFetch流畅。
-4. **验证规模有限**。hv-analysis来自Khazix的开源项目，经过了多次迭代；Deep Research是我在实际使用中逐步改造的，目前已经产出69篇横纵分析报告，覆盖产品、公司、概念、人物、历史事件等多种类型，累计消耗大几亿token。
+### ⚠️ 使用前必须配置
 
-### 什么时候用哪个
+本 skill 附带的是**占位值**，你需要根据自己的研究领域自行填入。
 
-如果你只是想快速了解一个产品或概念，不需要严格的来源审计和质检流程，hv-analysis足够了。它轻量、快速、上手容易。
+#### 1. 受控媒体名单（最重要）
 
-如果你需要一份经得起推敲的研究报告——关键事实有来源支撑、正反面声音都有覆盖、不会出现AI味的套话和编造——用Deep Research。它更重、更慢，但质量下限更高。
+IRSP 协议会排除受政权控制的宣传机构，但**具体排除哪些媒体，需要你自己定义**。
 
-两者并不冲突。Deep Research的分析框架完全继承自hv-analysis，只是在执行层面加了更多保障措施。你可以把Deep Research理解为hv-analysis的「生产环境版本」。
+| 文件 | 需要填入的位置 |
+|------|---------------|
+| `references/irsp.md` | 核心铁律章节中的示例列表 |
+| `references/audit-checklist.md` | 来源章节检查中的 `[用户自定义的受控媒体名单]` |
+| `references/source-audit-methodology.md` | 审查脚本模板中的 `banned = [...]` 列表 |
 
-### 相关项目
+填入你研究领域涉及的受控媒体名称和域名。不同用户研究不同地区，没有通用答案。
 
-- [hv-analysis](https://github.com/KKKKhazix/khazix-skills) - 横纵分析法方法论
+#### 2. 存档路径
 
----
+`SKILL.md` 中的存档路径是 `[your-archive-directory]`，替换为你的实际路径。
 
-## Teacher Agent Universal v3
+#### 3. 工具配置
 
-一个可迁移的长期私人教师系统——不是"会讲课的 AI"，而是一个能长期带学、持续诊断、动态调整教学策略的 Teacher Agent。
+工具分层策略引用了 firecrawl、exa、academic-research MCP 等工具。没有全部装齐也能用，但会退化。开始研究前确认你有哪些工具可用。
 
-**核心思想：用文件仓库代替 AI 的短期记忆，用课程状态文件代替一次性聊天，用长期教学协议代替普通问答。**
+### 局限
 
-### 它是什么
+1. **更重**：SKILL.md + 5个references + 1个scripts，首次加载token更多
+2. **更慢**：多了信息审计和质检复查两个环节
+3. **更挑工具**：没有firecrawl/exa时会退化
+4. **验证规模有限**：已产出69篇报告，但不是大规模对照实验
 
-- 长期私人教师，不是问答机器人
-- 课程设计者 + 学习诊断者 + 节奏控制者
-- 基于 Bloom 掌握学习法，未掌握则不推进
-- 支持 Book-Locked 教学——锁定一本书/文件夹作为唯一知识来源
+### 什么时候用 hv-analysis，什么时候用 Deep Research
 
-### 核心特性
+快速了解一个对象 → hv-analysis（轻量、快速）
 
-#### 1. Book-Locked Teaching（v3 核心）
+需要经得起推敲的报告 → Deep Research（重、慢、但质量下限更高）
 
-指定一本书、一个 PDF、或整个文件夹作为唯一教学来源：
-
-```
-/booktopic 福柯导读
-资料路径：D:\Books\Foucault.pdf
-```
-
-Agent 只能根据指定资料教学，禁止偷渡外部知识。资料没写的内容会明确说"指定材料未覆盖此点"。
-
-适合：研究生、法律、哲学、政治学、社科、理论书、技术文档。
-
-#### 2. 六种课程模式动态切换
-
-| 模式 | 用途 |
-|------|------|
-| Normal Lesson | 正常推进 |
-| Practice Lesson | 现场陪练 |
-| Remedial Lesson | 修补知识裂缝 |
-| Branch Lesson | 兴趣深挖 |
-| Checkpoint Lesson | 阶段检测 |
-| Book-Locked Lesson | 书籍锁定教学 |
-
-#### 3. 黑匣子审计机制
-
-每轮记录：为什么推进、为什么不矫正、真实风险、教学法选择依据。防止"看起来在教，其实在乱推"。
-
-#### 4. Bloom 掌握学习
-
-持续判断用户处于 Remember → Understand → Apply → Analyze → Evaluate → Create 的哪一层，未掌握则强制矫正，不机械推进。
-
-### 仓库结构
-
-```
-TeacherAgent_Universal_v3/
-├── _SYSTEM/          # Agent 的"宪法层"——教师身份、执行链、反懒规则
-├── _TEMPLATE/        # 新课题初始化模板
-├── IDENTITY.md
-└── SOUL.md
-```
-
-课题目录示例（一个仓库 = 一个长期学习宇宙）：
-
-```
-TeacherAgent_Universal_v3/
-├── 传播学基础/
-├── 法理学/
-├── 福柯导读/
-├── Python基础/
-└── 政治传播学/
-```
-
-每个课题目录包含：`learning_state.md`、`pedagogical_log.md`、`pedagogical_blackbox.md`、`lessons/`、`checkpoints/`、`source_scope.md`。
-
-### 快速开始
-
-#### Step 1：部署人格
-
-将 `人格设定.txt` 的内容粘贴到 AI 平台的 System Prompt / Persona / Character / Identity 位置。
-
-#### Step 2：告知仓库路径
-
-```
-Teacher Agent 仓库位于：D:\你的路径\TeacherAgent_Universal_v3
-```
-
-#### Step 3：确认进入 Teacher 模式
-
-首次启动后，让它读取 `_SYSTEM` 并汇报规则摘要。如果它开始闲聊，说明没启动成功。
-
-#### Step 4：创建新课题
-
-```
-/newtopic 传播学基础
-```
-
-或 Book-Locked 模式：
-
-```
-/booktopic 福柯导读
-资料路径：D:\Books\Foucault.pdf
-```
-
-### Book-Locked 正确行为
-
-✅ "这本书这里的意思其实是在说……"
-✅ "作者这里隐含了一个前提……"
-✅ "指定资料没有解释这一点。"
-
-❌ "我补充一下外部学界观点……"
-❌ "虽然书里没写，但其实……"
-
-### 推荐运行环境
-
-| 环境 | 推荐度 | 原因 |
-|------|--------|------|
-| Qclaw | ⭐⭐⭐⭐⭐ | 文件读写能力强 |
-| Hermes | ⭐⭐⭐⭐ | Agent 框架，文件操作完整 |
-| Claude Desktop | ⭐⭐⭐⭐ | 长上下文支持 |
-| OpenAI Agent | ⭐⭐⭐ | 基本可用 |
-| 普通网页聊天 | ⭐ | 缺少文件持久化，效果差 |
-
-Teacher Agent 本质是文件仓库驱动系统，文件读写能力越强，效果越好。
+两者不冲突。Deep Research 的分析框架完全继承自 hv-analysis，只是在执行层面加了保障措施。
 
 ---
 
-## 许可
+## License
 
 MIT
