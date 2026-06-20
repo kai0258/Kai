@@ -60,24 +60,6 @@ Key capabilities:
 
 ---
 
-### CC-Orchestrator
-
-A lightweight orchestration workflow for parallel AI-agent execution.
-
-Designed for Claude Code and terminal-based agent environments.
-
-Key capabilities:
-
-* Parallel task execution via tmux
-* Shared task logs (Task_Log.md)
-* Context handoff (Handoff_Prompt.txt)
-* Prompt distribution with backup
-* Partial-failure recovery
-
-- **Location:** [`cc-orchestrator-skill/`](cc-orchestrator-skill/)
-- **Also available as a standalone repo:** [kai0258/cc-orchestrator](https://github.com/kai0258/cc-orchestrator)
-
----
 
 ## Repository Philosophy
 
@@ -122,7 +104,7 @@ Typical output characteristics:
 
 ## Related Projects
 
-* [Task OS](https://github.com/kai0258/Task-os) — file-based task operating system for AI agents
+* [Task OS](https://github.com/kai0258/Task-os) — file-based task operating system and orchestration for AI agents
 * [hv-analysis](https://github.com/KKKKhazix/khazix-skills) — horizontal-vertical analysis methodology
 
 ---
@@ -130,3 +112,4 @@ Typical output characteristics:
 ## License
 
 [MIT](LICENSE)
+
