@@ -199,10 +199,11 @@ They're not in conflict. Think of Deep Research as the production-environment ve
 1. **Heavier.** SKILL.md + 5 references + 1 script = more tokens on first load.
 2. **Slower.** Two extra stages (source audit + quality review) add execution time.
 3. **Tool-dependent.** Designed for firecrawl/exa; without them, degradation is noticeable.
-4. **Limited validation.** 69 reports produced so far across products, companies, concepts, people, and historical events. Not a large-scale controlled study.
+4. **Limited validation.** 88 reports produced so far across products, companies, concepts, people, and historical events. Not a large-scale controlled study.
 
 ## Related projects
 
+- [cc-orchestrator](https://github.com/kai0258/cc-orchestrator) — Claude Code parallel orchestration and task relay
 - [hv-analysis](https://github.com/KKKKhazix/khazix-skills) — Horizontal-vertical analysis methodology
 
 ---
@@ -350,7 +351,7 @@ IRSP 协议会排除受政权控制的宣传机构，但**具体排除哪些媒�
 1. **更重**：SKILL.md + 5个references + 1个scripts，首次加载token更多
 2. **更慢**：多了信息审计和质检复查两个环节
 3. **更挑工具**：没有firecrawl/exa时会退化
-4. **验证规模有限**：已产出69篇报告，但不是大规模对照实验
+4. **验证规模有限**：已产出88篇报告，但不是大规模对照实验
 
 ### 什么时候用 hv-analysis，什么时候用 Deep Research
 
